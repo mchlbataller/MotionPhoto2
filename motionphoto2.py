@@ -39,7 +39,6 @@ def main():
         "-id", 
         "--input-directory",
         help="Mux all the photos and videos in a directory",
-        default=defaults['input_directory']
     )
     
     dir_group.add_argument(
@@ -78,7 +77,6 @@ def main():
         "-od",
         "--output-directory",
         help="Directory where to save the resulting Motion Photos",
-        default=defaults['output_directory']
     )
 
     settings_group = parser.add_argument_group(
@@ -125,21 +123,18 @@ def main():
         "-ii",
         "--input-image",
         help="Input file image (.heic, .jpg)",
-        default=defaults['input_image']
     )
         
     file_group.add_argument(
         "-iv",
         "--input-video",
         help="Input file video (.mov, .mp4)", 
-        default=defaults['input_video']
     )
 
     file_group.add_argument(
         "-of", 
         "--output-file",
         help="Output Live Photo filename",
-        default=defaults['output_file']
     )
 
     file_group.add_argument(
@@ -163,11 +158,23 @@ def main():
             print("[ERROR] Please provide both input image/video or input directory")
             sys.exit(1)
 
-    if args.output_directory is None and args.copy_unmuxed is True:
+    # Apply defaults after validation, but only for arguments that weren't provided
+    if args.input_directory is None:
+        args.input_directory = defaults['input_directory']
+    if args.input_image is None:
+        args.input_image = defaults['input_image']
+    if args.input_video is None:
+        args.input_video = defaults['input_video']
+    if args.output_directory is None:
+        args.output_directory = defaults['output_directory']
+    if args.output_file is None:
+        args.output_file = defaults['output_file']
+
+    if not args.output_directory and args.copy_unmuxed is True:
         print("[ERROR] Copy unmuxed cannot be used without output directory")
         sys.exit(1)
 
-    if args.output_directory is None and args.incremental_mode is True:
+    if not args.output_directory and args.incremental_mode is True:
         print("[ERROR] Incremental mode cannot be used without output directory")
         sys.exit(1)
 
@@ -187,14 +194,14 @@ def main():
         print("[ERROR] Copy Unmuxed cannot be used with delete-video option")
         sys.exit(1)
 
-    if args.output_directory is not None:
+    if args.output_directory:
         output_directory = f"{Path(args.output_directory).resolve()}"
         if os.path.exists(output_directory) is False:
             os.mkdir(output_directory)
         elif os.path.isfile(output_directory):
             print("[ERROR] Output directory cannot be a file")
             sys.exit(1)
-        elif args.copy_unmuxed is not None:
+        elif args.copy_unmuxed:
             input_directory = f"{Path(args.input_directory).resolve()}"
             if os.path.samefile(input_directory, output_directory): # Input directory and output directory cannot be same if copying unmuxed files
                 print("[ERROR] Output directory cannot be the same as input directory")
@@ -223,7 +230,7 @@ def main():
         logger=logger if args.verbose is True else None
     ) as et:
 
-        if args.input_directory is not None:
+        if args.input_directory:
             print(f"Converting files in {args.input_directory}")
             input_directory = Path(args.input_directory).resolve()
             
