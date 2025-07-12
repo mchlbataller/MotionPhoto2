@@ -11,7 +11,6 @@ import shutil
 import sys
 
 from pathlib import Path
-from gooey import GooeyParser
 
 from Muxer import Muxer
 from utils import is_motion_photo, extract_video_from_image, input_output_binary_compare, load_defaults, save_defaults
@@ -27,109 +26,95 @@ def main():
     
     defaults = load_defaults()
     
-    parser = GooeyParser(
+    parser = argparse.ArgumentParser(
         prog="MotionPhoto2",
         description="Mux HEIC and JPG Live Photos into Google/Samsung Motion Photos",
     )
     
     dir_group = parser.add_argument_group(
-        "Process a Directory",
-        gooey_options={'columns':4}
+        "Process a Directory"
     )
 
     dir_group.add_argument(
         "-id", 
         "--input-directory",
-        metavar="Input Directory",
         help="Mux all the photos and videos in a directory",
-        widget='DirChooser',
-        gooey_options={'full_width':True, 'initial_value':defaults['input_directory']}
+        default=defaults['input_directory']
     )
     
     dir_group.add_argument(
         "-r",
         "--recursive",
-        metavar="Recursive",
         action="store_true",
         help="Recursively process subdirectories",
-        gooey_options={'initial_value':defaults['recursive']}
+        default=defaults['recursive']
     )
 
     dir_group.add_argument(
         "-em", 
         "--exif-match",
-        metavar="Match by EXIF",
         action="store_true",
         help="Match files by Live Photo metadata",
-        gooey_options={'initial_value':defaults['exif_match']}
+        default=defaults['exif_match']
     )
 
     dir_group.add_argument(
         "-im",
         "--incremental-mode",
-        metavar="Incremental Mode",
         action="store_true",
         help="Skip photos already muxed in output",
-        gooey_options={'initial_value':defaults['incremental_mode']}
+        default=defaults['incremental_mode']
     )
     
     dir_group.add_argument(
         "-cu",
         "--copy-unmuxed",
-        metavar="Copy Unmuxed",
         action="store_true",
         help="Copy other files",
-        gooey_options={'initial_value':defaults['copy_unmuxed']}
+        default=defaults['copy_unmuxed']
     )
 
     dir_group.add_argument(
         "-od",
         "--output-directory",
-        metavar="Output Directory",
         help="Directory where to save the resulting Motion Photos",
-        widget='DirChooser',
-        gooey_options={'full_width':True, 'initial_value':defaults['output_directory']}
+        default=defaults['output_directory']
     )
 
     settings_group = parser.add_argument_group(
-        "Settings",
-        gooey_options={'columns':4}
+        "Settings"
     )
 
     settings_group.add_argument(
         "-dv",
         "--delete-video",
-        metavar="Delete Video",
         action="store_true",
         help="Delete video after muxing",
-        gooey_options={'initial_value':defaults['delete_video']}
+        default=defaults['delete_video']
     )
     
     settings_group.add_argument(
         "-o",
         "--overwrite",
-        metavar="Overwrite",
         action="store_true",
         help="Overwrite the original image",
-        gooey_options={'initial_value':defaults['overwrite']}
+        default=defaults['overwrite']
     )
 
     settings_group.add_argument(
         "-kt",
         "--keep-temp",
-        metavar="Keep Temp",
         action="store_true",
         help="Keep muxing temp files",
-        gooey_options={'initial_value':defaults['keep_temp']}
+        default=defaults['keep_temp']
     )
     
     settings_group.add_argument(
         "-v", 
         "--verbose",
-        metavar="Verbose",
         action="store_true", 
         help="Verbose output",
-        gooey_options={'initial_value':defaults['verbose']}
+        default=defaults['verbose']
     )
 
     file_group = parser.add_argument_group(
@@ -139,60 +124,30 @@ def main():
     file_group.add_argument(
         "-ii",
         "--input-image",
-        metavar="Input Image",
         help="Input file image (.heic, .jpg)",
-        widget='FileChooser',
-        gooey_options={
-            'wildcard':
-                "HEIC file|*.heic|"
-                "HEIF file|*.heif|"
-                "JPG file|*.jpg|"
-                "All files (*.*)|*.*",
-            'message': "Select image file",
-            'initial_value':defaults['input_image']
-        }
+        default=defaults['input_image']
     )
         
     file_group.add_argument(
         "-iv",
         "--input-video",
-        metavar="Input Video",
         help="Input file video (.mov, .mp4)", 
-        widget='FileChooser',
-        gooey_options={
-            'wildcard':
-                "MOV file|*.mov|"
-                "MP4 file|*.mp4|"
-                "All files (*.*)|*.*",
-            'message': "Select video file",
-            'initial_value':defaults['input_video']
-        }
+        default=defaults['input_video']
     )
 
     file_group.add_argument(
         "-of", 
         "--output-file",
-        metavar="Output File",
         help="Output Live Photo filename",
-        widget='FileSaver',
-        gooey_options={
-            'wildcard':
-                "HEIC file|*.heic|"
-                "HEIF file|*.heif|"
-                "JPG file|*.jpg|"
-                "All files (*.*)|*.*",
-            'message': "Target image file",
-            'initial_value':defaults['output_file']
-        }
+        default=defaults['output_file']
     )
 
     file_group.add_argument(
         "-nx",
         "--no-xmp",
-        metavar="No XMP",
         action="store_true",
         help="No XMP processing (just glue image and video using Samsung tags)",
-        gooey_options={'visible':False, 'initial_value':defaults['no_xmp']}
+        default=defaults['no_xmp']
     )
 
     args = parser.parse_args()
@@ -490,17 +445,4 @@ def main():
             ).mux()
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1:
-        from gooey import Gooey
-        main = Gooey(program_name='MotionPhoto2',
-                     default_size=(1100, 820),
-                     progress_regex=r"^=+\[(\d+)/(\d+)]$",
-                     progress_expr="x[0] / x[1] * 100",
-                     show_restart_button=False,
-                    )(main)
-    # Gooey reruns the script with this parameter for the actual execution.
-    # Since we don't use decorator to enable commandline use, remove this parameter
-    # and just run the main when in commandline mode.
-    if '--ignore-gooey' in sys.argv:
-        sys.argv.remove('--ignore-gooey')
     main()
