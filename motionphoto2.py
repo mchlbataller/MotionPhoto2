@@ -159,6 +159,24 @@ def main():
             sys.exit(1)
 
     # Apply defaults after validation, but only for arguments that weren't provided
+    # For conflicting options (output_file and output_directory), only use hardcoded defaults
+    hardcoded_defaults = {
+        'input_directory': '',
+        'recursive': True,
+        'exif_match': True,
+        'incremental_mode': False,
+        'copy_unmuxed': False,
+        'output_directory': '',
+        'delete_video': False,
+        'overwrite': False,
+        'keep_temp': False,
+        'verbose': False,
+        'input_image': '',
+        'input_video': '',
+        'output_file': '',
+        'no_xmp': False
+    }
+    
     if args.input_directory is None:
         args.input_directory = defaults['input_directory']
     if args.input_image is None:
@@ -166,9 +184,9 @@ def main():
     if args.input_video is None:
         args.input_video = defaults['input_video']
     if args.output_directory is None:
-        args.output_directory = defaults['output_directory']
+        args.output_directory = hardcoded_defaults['output_directory']  # Use hardcoded default
     if args.output_file is None:
-        args.output_file = defaults['output_file']
+        args.output_file = hardcoded_defaults['output_file']  # Use hardcoded default
 
     if not args.output_directory and args.copy_unmuxed is True:
         print("[ERROR] Copy unmuxed cannot be used without output directory")
