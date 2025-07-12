@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  motionphoto2:
+    build: .
+    volumes:
+      - ./input:/input
+      - ./output:/output
+    # Override the default command with your desired arguments
+    # Example: Process all files in /input directory
+    command: ["python", "motionphoto2.py", "--input-directory", "/input", "--output-directory", "/output", "--verbose"]
+    
+    # For individual file processing, use:
+    # command: ["python", "motionphoto2.py", "--input-image", "/input/image.jpg", "--input-video", "/input/video.mp4", "--output-directory", "/output"]
