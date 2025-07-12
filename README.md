@@ -6,17 +6,35 @@ In case the source is an iPhone Live Photo, the presentation timestamp will be m
 
 Photos are created to mimic the way Galaxy S23 Ultra and Tab S9 phones create HEIC and JPG motion photos. This format internally refers to itself as mpv2 (and recently also mpv3), thus the name of this script.
 
-![GUI Screenshot](documentation/images/GUI.png?raw=true "GUI")
-
 ## Installation
 
-### Windows
+### Docker (Recommended for headless usage)
+
+The application now supports Docker for headless operation without GUI dependencies:
+
+```bash
+# Build the Docker image
+docker build -t motionphoto2 .
+
+# Run with Docker
+docker run -v /path/to/input:/input -v /path/to/output:/output motionphoto2 \
+  python motionphoto2.py --input-directory /input --output-directory /output --verbose
+
+# Or use docker-compose
+docker-compose up
+```
+
+See [README_HEADLESS.md](README_HEADLESS.md) for detailed Docker usage instructions.
+
+### Traditional Installation
+
+#### Windows
 
 Please install ExifTool so that it is added to your path. The easiest is to use [installer by Oliver Betz](https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows). Use the file "ExifTool_install_nn.nn_64.exe" and accept all defaults.
 
 Then download the Windows release and enjoy!
 
-### Unix and MacOS
+#### Unix and MacOS
 
 The script requires [ExifTool](https://exiftool.org/) on your computer. Once you have exiftool installed, download the respective release for your OS and extract the binary file from the zip archive.
 
@@ -32,13 +50,32 @@ You may now run the binary either by _double-clicking_ on it from your file expl
 ./motionphoto2
 ```
 
-### Running from python interpreter directly
+#### Running from python interpreter directly
 
-If you have both exiftool and python 3.7+ installed, the script works just by calling motionphoto2.py (with parameters if required). Please install prerequisities using `pip install -r requirements.txt`
+If you have both exiftool and python 3.7+ installed, the script works just by calling motionphoto2.py (with parameters if required). Please install prerequisites using `pip install -r requirements.txt`
 
 ## Usage
 
-Just run the script! If you run it without parameters, it'll present a GUI with explanations. Alternatively, you can use it using commandline as per below examples.
+### Docker Usage (Headless)
+
+The application now supports headless operation through Docker:
+
+```bash
+# Process a directory
+docker run -v /path/to/input:/input -v /path/to/output:/output motionphoto2 \
+  python motionphoto2.py --input-directory /input --output-directory /output
+
+# Process individual files  
+docker run -v /path/to/files:/input -v /path/to/output:/output motionphoto2 \
+  python motionphoto2.py --input-image /input/image.jpg --input-video /input/video.mp4 --output-directory /output
+
+# Using docker-compose
+docker-compose up
+```
+
+### Command Line Usage
+
+The script can be run entirely from the command line without any GUI. If you run it without parameters, it will show help instead of opening a GUI.
 
 ### Individual photos
 
@@ -74,6 +111,18 @@ motionphoto2 --input-directory /your/directory --exif-match
 - To use EXIF matching instead of filename matching, use: `--exif-match`
 - To copy files other than live/motion photo muxing during directory processing, use: `--copy-unmuxed`
 - To skip muxing if destination is already a motion photo use: `--incremental-mode` (Useful for performing incremental photo library updates)
+
+## Changes from Original
+
+**This version has been converted to headless operation:**
+
+- ✅ Removed GUI dependencies (Gooey, wxPython)
+- ✅ Converted to command-line only interface
+- ✅ Added Docker support for containerization
+- ✅ Suitable for server environments and automation
+- ✅ All original functionality preserved
+
+For the GUI version, please use the original releases. For headless operation, use this version.
 
 ## Limitations
 
