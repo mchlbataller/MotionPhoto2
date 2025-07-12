@@ -61,18 +61,21 @@ class Muxer:
             self.logger.error("Video file doesn't exist")
             sys.exit(1)
 
-        if self.output_directory is not None:
+        if self.output_directory is not None and self.output_directory.strip():
             self.output_directory = f"{Path(output_directory).resolve()}"
 
             if os.path.exists(self.output_directory) is False:
                 self.logger.error("Output directory doesn't exist, please create")
                 sys.exit(1)
+        elif self.output_directory is not None and not self.output_directory.strip():
+            # Empty string should be treated as None
+            self.output_directory = None
 
-        if self.overwrite is True and output_fpath is not None:
+        if self.overwrite is True and output_fpath is not None and output_fpath.strip():
             self.logger.error("Output file cannot be use overwrite option")
             sys.exit(1)
 
-        if output_fpath is not None and self.output_directory is not None:
+        if output_fpath is not None and output_fpath.strip() and self.output_directory is not None and self.output_directory.strip():
             self.logger.error("Output file cannot be use with output directory")
             sys.exit(1)
 
